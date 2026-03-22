@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iris Classifier</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1.5px solid #e8eaf0;
+      border-radius: 16px;
+      padding: 40px;
+      width: 420px;
+      box-shadow: 0 4px 24px rgba(100, 90, 160, 0.08);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .flower-icon {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 14px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #3b2f8f;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #8b87a8;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #ede8f8;
+      margin: 0 0 28px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #5c4fb5;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #ddd8f5;
+      border-radius: 8px;
+      font-size: 15px;
+      color: #2d2260;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #fafafe;
+    }
+
+    input[type="number"]:focus {
+      border-color: #6c5ce7;
+      background: #ffffff;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 8px;
+      padding: 13px;
+      background: #6c5ce7;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button:hover { background: #5a4bd1; }
+    button:active { transform: scale(0.98); }
+
+    .result {
+      margin-top: 24px;
+      padding: 18px 20px;
+      border-radius: 10px;
+      background: #f3f0fd;
+      border: 1.5px solid #d4cef7;
+      display: none;
+      text-align: center;
+    }
+
+    .result.show { display: block; }
+
+    .result-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #8b87a8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .result-species {
+      font-size: 26px;
+      font-weight: 700;
+      color: #3b2f8f;
+      text-transform: capitalize;
+    }
+
+    .result-class {
+      font-size: 13px;
+      color: #8b87a8;
+      margin-top: 4px;
+    }
+
+    .error {
+      background: #fff0f0;
+      border-color: #f5c2c2;
+    }
+
+    .error .result-species {
+      font-size: 15px;
+      color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <svg class="flower-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="26" cy="13" rx="6" ry="11" fill="#b8aef5"/>
+        <ellipse cx="26" cy="13" rx="6" ry="11" fill="#b8aef5" transform="rotate(60 26 26)"/>
+        <ellipse cx="26" cy="13" rx="6" ry="11" fill="#b8aef5" transform="rotate(120 26 26)"/>
+        <ellipse cx="26" cy="13" rx="6" ry="11" fill="#d6d0fa" transform="rotate(180 26 26)"/>
+        <ellipse cx="26" cy="13" rx="6" ry="11" fill="#d6d0fa" transform="rotate(240 26 26)"/>
+        <ellipse cx="26" cy="13" rx="6" ry="11" fill="#d6d0fa" transform="rotate(300 26 26)"/>
+        <circle cx="26" cy="26" r="7" fill="#6c5ce7"/>
+      </svg>
+      <h1>Iris Classifier</h1>
+      <p class="subtitle">Enter flower measurements to predict the species</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="row">
+      <div class="field">
+        <label>Sepal Length (cm)</label>
+        <input type="number" id="sepal_length" step="0.1" min="0" value="5.1">
+      </div>
+      <div class="field">
+        <label>Sepal Width (cm)</label>
+        <input type="number" id="sepal_width" step="0.1" min="0" value="3.5">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Petal Length (cm)</label>
+        <input type="number" id="petal_length" step="0.1" min="0" value="1.4">
+      </div>
+      <div class="field">
+        <label>Petal Width (cm)</label>
+        <input type="number" id="petal_width" step="0.1" min="0" value="0.2">
+      </div>
+    </div>
+
+    <button onclick="predict()">Predict Species</button>
+
+    <div class="result" id="result">
+      <div class="result-label">Predicted Species</div>
+      <div class="result-species" id="species"></div>
+      <div class="result-class" id="class-label"></div>
+    </div>
+  </div>
+
+  <script>
+    async function predict() {
+      const body = {
+        sepal_length: parseFloat(document.getElementById('sepal_length').value),
+        sepal_width:  parseFloat(document.getElementById('sepal_width').value),
+        petal_length: parseFloat(document.getElementById('petal_length').value),
+        petal_width:  parseFloat(document.getElementById('petal_width').value)
+      };
+
+      const resultBox = document.getElementById('result');
+      const speciesEl = document.getElementById('species');
+      const classEl   = document.getElementById('class-label');
+
+      try {
+        const res  = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+
+        resultBox.className = 'result show';
+        speciesEl.textContent = data.species;
+        classEl.textContent   = 'Class ' + data.prediction;
+
+      } catch (err) {
+        resultBox.className = 'result show error';
+        speciesEl.textContent = 'Prediction failed';
+        classEl.textContent   = 'Check that app.py is running';
+      }
+    }
+  </script>
+</body>
+</html>
